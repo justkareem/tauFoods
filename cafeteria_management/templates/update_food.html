@@ -1,0 +1,63 @@
+{% extends "base_template.html" %}
+
+{% block main %}
+    <div class="row" id="card-container">
+
+    </div>
+    <div id="exampleModalCenter" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalCenterTitle">Order ready for pick-up?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure this order is packed and ready for pick up?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+        <button type="button" class="btn btn-primary" id="confirmReady">Yes</button>
+      </div>
+    </div>
+  </div>
+</div>
+    <script>
+        $(document).ready(function() {
+            // Fetch data from backend and populate the table
+            $.ajax({
+                url: '{% url "get_all_foods" %}',
+                method: 'GET',
+                success: function(data) {
+                    const cardContainer = $('#card-container');
+                    data.forEach(function(item) {
+                        const cardHtml = `
+                            <div class="col-md-4">
+                                <div class="card mb-3">
+                                    <img class="img-fluid card-img-top" src="${item.img}" alt="Card image cap">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col">
+                                              <h5 class="card-title">${item.title}</h5>
+                                              <p class="card-text">${item.price}</p>
+                                            </div>
+                            <div class="col">
+                                <div class="btn-group mb-2 me-2">
+                                    <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Change</button>
+                                      <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="{% url 'update_food' %}?available=true&id=${item.id}">Available</a>
+                                        <a class="dropdown-item" href="{% url 'update_food' %}?available=false&id=${item.id}">Unavailable</a>
+                                      </div>
+                                </div>
+                            </div>
+                                <p class="card-text"><small class="text-muted">${item.available ? 'Available' : 'Unavailable'}</small></p>
+                                       </div>
+                                    </div>
+                                </div>
+                            </div>`;
+                        cardContainer.append(cardHtml);
+                    });
+                }
+            });
+        });
+    </script>
+{% endblock %}

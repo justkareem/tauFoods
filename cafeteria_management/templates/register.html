@@ -1,0 +1,57 @@
+{% extends "auth_template.html" %}
+{% load static %}
+{% block title %}Register{% endblock %}
+{% block main %}
+<div class="auth-main v1">
+      <div class="auth-wrapper">
+        <div class="auth-form">
+          <div class="card my-5">
+            <div class="card-body">
+              <div class="text-center">
+                <img
+                  src="{% static 'images/authentication/img-auth-register.png' %}"
+                  alt="images"
+                  class="img-fluid mb-3"
+                />
+                <h4 class="f-w-500 mb-1">Register with your email</h4>
+                {% if form.errors %} {% for field in form %} {% if field.errors%}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endif %} {% endfor %} {% endif %}
+                <p class="mb-3">
+                  Already have an Account?
+                  <a href="/staff/login/" class="link-primary">Log in</a>
+                </p>
+              </div>
+              <form method="POST" action="/staff/register/">
+                {% csrf_token %} {{ form.as_p }}
+                <div class="d-flex mt-1 justify-content-between">
+                  <div class="form-check">
+                    <input
+                      class="form-check-input input-primary"
+                      type="checkbox"
+                      id="customCheckc1"
+                      checked=""
+                    />
+                    <label
+                      class="form-check-label text-muted"
+                      for="customCheckc1"
+                      >I agree to all the Terms & Condition</label
+                    >
+                  </div>
+                </div>
+                <div class="d-grid mt-4">
+                  <button type="submit" class="btn btn-primary">
+                    Create Account
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="auth-sidefooter"></div>
+      </div>
+    </div>
+{% endblock %}

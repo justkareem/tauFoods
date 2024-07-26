@@ -1,0 +1,119 @@
+{% extends "base_template.html" %}
+{% load static %}
+
+{% block main %}
+<div class="container">
+        <table class="table table-hover" id="dataTable">
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Order Items</th>
+                    <th scope="col">Order Time</th>
+                    <th scope="col">Payment reference</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be dynamically inserted here -->
+            </tbody>
+        </table>
+    </div>
+    <div id="exampleModalCenter" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalCenterTitle">Order ready for pick-up?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure this order is packed and ready for pick up?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+        <button type="button" class="btn btn-primary" id="confirmReady">Yes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script>
+    function formatDate(dateString) {
+        // Create a new Date object from the dateString
+        const date = new Date(dateString);
+
+        // Define options for formatting the date
+        const options = {
+            year: 'numeric',
+            month: 'long', // 'short' for abbreviated month name
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true // Use 12-hour format
+        };
+
+        // Format the date using toLocaleDateString and toLocaleTimeString
+        return date.toLocaleDateString('en-US', options);
+    }
+        $(document).ready(function() {
+            // Fetch data from backend and populate the table
+            $.ajax({
+                url: '{% url "get_processing_orders" %}',
+                method: 'GET',
+                success: function(data) {
+                    var tableBody = $('#dataTable tbody');
+                    data.forEach(function(item) {
+                        let orderItems = "";
+                        orderItems = Object.entries(item.order_items)
+                            .map(([key, value]) => `<b>${key}</b> x <b>${value}</b>`)
+                            .join("<br>");
+
+                        var row = '<tr>' +
+                                  '<td>' + item.id + '</td>' +
+                                  '<td>' + item.user__username + '</td>' +
+                                  '<td>' + orderItems + '</td>' +
+                                  '<td>' + formatDate(item.created_at) + '</td>' +
+                                  '<td>' + item.payment_reference + '</td>' +
+                                  '<td><button type="button" class="btn btn-primary order-done" data-bs-toggle="modal" data-bs-target="#exampleModalCenter">Ready</button></td>' +
+                                  '</tr>';
+                        tableBody.append(row);
+                    });
+                    // Add event listener for delete buttons
+                     let selectedOrderId = null;
+                     let selectedRow = null;
+
+                     $('.order-done').click(function() {
+                         selectedRow = $(this).closest('tr');
+                         selectedOrderId = selectedRow.find('td:first').text();
+                     });
+
+                     $('#confirmReady').click(function() {
+                         if (!selectedOrderId) {
+                             console.error('Order ID is empty');
+                             return;
+                         }
+                         const order_data = {
+                             id: selectedOrderId,
+                             order_status: 'ready'
+                         };
+                         $.ajax({
+                    url: '{% url "update_order" %}',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(order_data),
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        $('#exampleModalCenter').modal('hide');
+                        selectedRow.remove();
+                    }
+                });
+                    });
+
+                }
+            });
+        });
+    </script>
+{% endblock %}
