@@ -17,10 +17,10 @@ import cloudinary.uploader
 import cloudinary.api
 
 cloudinary.config(
-  cloud_name = 'domxe7bns',
-  api_key = '793978527853643',
-  api_secret = '0HoCYrOHJw90AuOoNTmL_0OqudI',
-  secure = True
+    cloud_name='domxe7bns',
+    api_key='793978527853643',
+    api_secret='0HoCYrOHJw90AuOoNTmL_0OqudI',
+    secure=True
 )
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
@@ -97,10 +97,10 @@ WSGI_APPLICATION = 'djangoProject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'cafeteria',
-        'USER': 'postgres',
-        'PASSWORD': 'root',
-        'HOST': '127.0.0.1',
+        'NAME': 'tau_foods',
+        'USER': 'tau_foods_user',
+        'PASSWORD': 'kY63F2pT6VEB3sw9RXm5Tya8eL37Uc3L',
+        'HOST': 'dpg-cqidq5ggph6c738nkl70-a',
         'PORT': '5432',
     }
 }
