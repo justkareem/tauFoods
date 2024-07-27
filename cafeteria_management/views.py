@@ -18,7 +18,8 @@ def register(request):
         form = RegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            group = Group.objects.get_or_create(name='staff')
+            Group.objects.get_or_create(name='staff')
+            group = Group.objects.get(name='staff')
             user.groups.add(group)
             messages.success(request, 'Registration successful.')
             return redirect('login')
