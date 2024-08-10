@@ -39,81 +39,98 @@
 
     <script>
     function formatDate(dateString) {
-        // Create a new Date object from the dateString
         const date = new Date(dateString);
-
-        // Define options for formatting the date
         const options = {
             year: 'numeric',
-            month: 'long', // 'short' for abbreviated month name
+            month: 'long',
             day: 'numeric',
             hour: '2-digit',
             minute: '2-digit',
             second: '2-digit',
-            hour12: true // Use 12-hour format
+            hour12: true
         };
-
-        // Format the date using toLocaleDateString and toLocaleTimeString
         return date.toLocaleDateString('en-US', options);
     }
-        $(document).ready(function() {
-            // Fetch data from backend and populate the table
-            $.ajax({
-                url: '{% url "get_processing_orders" %}',
-                method: 'GET',
-                success: function(data) {
-                    var tableBody = $('#dataTable tbody');
-                    data.forEach(function(item) {
-                        let orderItems = "";
-                        orderItems = Object.entries(item.order_items)
-                            .map(([key, value]) => `<b>${key}</b> x <b>${value}</b>`)
-                            .join("<br>");
 
-                        var row = '<tr>' +
-                                  '<td>' + item.id + '</td>' +
-                                  '<td>' + item.user__username + '</td>' +
-                                  '<td>' + orderItems + '</td>' +
-                                  '<td>' + formatDate(item.created_at) + '</td>' +
-                                  '<td>' + item.payment_reference + '</td>' +
-                                  '<td><button type="button" class="btn btn-primary order-done" data-bs-toggle="modal" data-bs-target="#exampleModalCenter">Ready</button></td>' +
-                                  '</tr>';
-                        tableBody.append(row);
-                    });
-                    // Add event listener for delete buttons
-                     let selectedOrderId = null;
-                     let selectedRow = null;
+    function loadOrders(page = 1) {
+        $.ajax({
+            url: '{% url "get_processing_orders" %}',
+            method: 'GET',
+            data: { 'page': page },
+            success: function(data) {
+                var tableBody = $('#dataTable tbody');
+                tableBody.empty();
 
-                     $('.order-done').click(function() {
-                         selectedRow = $(this).closest('tr');
-                         selectedOrderId = selectedRow.find('td:first').text();
-                     });
+                data.orders.forEach(function(item) {
+                    const orderItems = item.order_items.foodItems
+                        .map(foodItem => `<b>${foodItem.title}</b> x <b>${foodItem.quantity}</b>`)
+                        .join("<br>");
 
-                     $('#confirmReady').click(function() {
-                         if (!selectedOrderId) {
-                             console.error('Order ID is empty');
-                             return;
-                         }
-                         const order_data = {
-                             id: selectedOrderId,
-                             order_status: 'ready'
-                         };
-                         $.ajax({
-                    url: '{% url "update_order" %}',
-                    method: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(order_data),
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}'
-                    },
-                    success: function(response) {
-                        $('#exampleModalCenter').modal('hide');
-                        selectedRow.remove();
-                    }
+                    var row = '<tr>' +
+                              '<td>' + item.id + '</td>' +
+                              '<td>' + item.user__username + '</td>' +
+                              '<td>' + orderItems + '</td>' +
+                              '<td>' + formatDate(item.created_at) + '</td>' +
+                              '<td>' + item.payment_reference + '</td>' +
+                              '<td><button type="button" class="btn btn-primary order-done" data-bs-toggle="modal" data-bs-target="#exampleModalCenter">Ready</button></td>' +
+                              '</tr>';
+                    tableBody.append(row);
                 });
-                    });
 
+                // Pagination controls
+                $('#pagination-controls').html('');  // Clear existing controls
+
+                if (data.has_previous) {
+                    $('#pagination-controls').append('<button class="page-link mx-1" onclick="loadOrders(' + data.previous_page_number + ')">Previous</button>');
                 }
-            });
+                $('#pagination-controls').append('<span class="mx-2"> Page ' + data.current_page + ' of ' + data.total_pages + ' </span>');
+                if (data.has_next) {
+                    $('#pagination-controls').append('<button class="page-link mx-1" onclick="loadOrders(' + data.next_page_number + ')">Next</button>');
+                }
+
+
+                // Add event listener for 'Ready' buttons
+                let selectedOrderId = null;
+                let selectedRow = null;
+
+                $('.order-done').click(function() {
+                    selectedRow = $(this).closest('tr');
+                    selectedOrderId = selectedRow.find('td:first').text();
+                });
+
+                $('#confirmReady').click(function() {
+                    if (!selectedOrderId) {
+                        console.error('Order ID is empty');
+                        return;
+                    }
+                    const order_data = {
+                        id: selectedOrderId,
+                        order_status: 'ready'
+                    };
+                    $.ajax({
+                        url: '{% url "update_order" %}',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(order_data),
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        success: function(response) {
+                            $('#exampleModalCenter').modal('hide');
+                            selectedRow.remove();
+                        }
+                    });
+                });
+            }
         });
-    </script>
+    }
+
+    // Load the first page of orders when the page loads
+    $(document).ready(function() {
+        loadOrders();
+    });
+</script>
+
+<div id="pagination-controls" class="d-flex justify-content-center my-3"></div>
+
 {% endblock %}

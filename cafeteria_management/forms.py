@@ -37,7 +37,7 @@ class LoginForm(forms.Form):
     }))
     remember_me = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={
         'class': 'form-check-input input-primary',
-        'id': 'customCheckc1'
+        'id': 'customCheck1'
     }))
 
 
@@ -55,3 +55,25 @@ class FoodForm(forms.Form):
     img = forms.ImageField(widget=forms.ClearableFileInput(attrs={
         'class': 'form-control',
     }))
+
+
+class AnnouncementForm(forms.Form):
+    title = forms.CharField(
+        label='Title',
+        max_length=100,
+        required=False,  # Title is not required
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter Notification Title',
+            'aria-describedby': 'titleHelp'
+        })
+    )
+    content = forms.CharField(
+        label='Content',
+        max_length=500,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Enter Notification Content'
+        })
+    )

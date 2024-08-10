@@ -11,21 +11,13 @@
               <img src="{% static 'images/authentication/img-auth-login.png'%}" alt="images" class="img-fluid mb-3">
               <h4 class="f-w-500 mb-1">Login with your email</h4>
                 {% if messages %}
-            {% for message in messages %}
-                <div
-                  class="alert alert-danger alert-dismissible fade show"
-                  role="alert"
-                >
-                    {{message}}
-                  <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="alert"
-                    aria-label="Close"
-                  ></button>
-                </div>
-            {% endfor %}
-        {% endif %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
               <p class="mb-3">Don't have an Account? <a href="/staff/register/" class="link-primary ms-1">Create Account</a></p>
             </div>
               <form method="POST" action="/staff/login/">

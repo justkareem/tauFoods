@@ -14,12 +14,16 @@
                   class="img-fluid mb-3"
                 />
                 <h4 class="f-w-500 mb-1">Register with your email</h4>
-                {% if form.errors %} {% for field in form %} {% if field.errors%}
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% endif %} {% endfor %} {% endif %}
+                {% if form.errors %}
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                {{ error }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                {% endif %}
                 <p class="mb-3">
                   Already have an Account?
                   <a href="/staff/login/" class="link-primary">Log in</a>

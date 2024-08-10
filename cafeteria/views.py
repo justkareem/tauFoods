@@ -12,7 +12,7 @@ from rest_framework.decorators import api_view, permission_classes, authenticati
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import FoodItem, Order, Payment
-from .serializers import FoodItemSerializer, UserSerializer
+from .serializers import FoodItemSerializer, UserSerializer, OrderSerializer
 import requests
 from datetime import datetime
 
@@ -130,9 +130,6 @@ def newOrder(request):
     data = request.body.decode("utf-8")
     data = json.loads(data)
     payment_reference = data.get("payment_reference")
-    print(type(json.loads(data.get("order_items"))))
-    print(type(data.get("order_items")))
-    print(request.user)
 
     url = f"https://api.paystack.co/transaction/verify/{payment_reference}"
     headers = {
@@ -140,22 +137,20 @@ def newOrder(request):
     }
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
-
-        order = Order.objects.create(
-            user=request.user,
-            order_items=json.loads(data.get("order_items")),
-            total_amount=float(data.get("amount")),
-            payment_reference=data.get("payment_reference")
-        )
-        data = response.json()
-        if data['status']:
-            print(data['data']['paid_at'])
+        res = response.json()
+        if res['data']['status'] == 'success':
+            order = Order.objects.create(
+                user=request.user,
+                order_items=json.loads(data.get("order_items")),
+                total_amount=float(data.get("amount")),
+                payment_reference=data.get("payment_reference")
+            )
             Payment.objects.create(
                 order=order,
-                payment_channel=data['data']['channel'],
-                paid_at=datetime.strptime(data['data']['paid_at'], '%Y-%m-%dT%H:%M:%S.%fZ'),
-                created_at=datetime.strptime(data['data']['created_at'], '%Y-%m-%dT%H:%M:%S.%fZ'),
-                ip_address=data['data']['ip_address'],
+                payment_channel=res['data']['channel'],
+                paid_at=datetime.strptime(res['data']['paid_at'], '%Y-%m-%dT%H:%M:%S.%fZ'),
+                created_at=datetime.strptime(res['data']['created_at'], '%Y-%m-%dT%H:%M:%S.%fZ'),
+                ip_address=res['data']['ip_address'],
             )
     else:
         # Handle errors or unsuccessful status codes
@@ -217,4 +212,17 @@ def deleteFoodItem(request, pk):
     foodItem = FoodItem.objects.get(id=pk)
     foodItem.delete()
     return Response("FoodItem has been deleted!")
+
+
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def getUserOrders(request):
+    data = request.body.decode("utf-8")
+    data = json.loads(data)
+    if request.user.username != data['email']:
+        return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+    orders = Order.objects.filter(user=request.user)
+    serializer = OrderSerializer(orders, many=True)
+    return Response(serializer.data)
 

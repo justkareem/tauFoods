@@ -10,5 +10,6 @@ def menu_items(request):
              ]
              },
             {'name': 'Transactions', 'url': 'transactions', 'icon': 'ph-duotone ph-currency-ngn'},
+            {'name': 'Announcement', 'url': 'send_announcement', 'icon': 'ph-duotone ph-megaphone'},
         ]
     }

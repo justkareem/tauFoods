@@ -38,7 +38,7 @@ SECRET_KEY = 'django-insecure-9_bul-2v3)z@(%*n9#j%1z0xm=9rxn@yq!t^%uk%@k=z_=$mmg
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["10.0.2.2", "127.0.0.1", "taufoods.onrender.com"]
+ALLOWED_HOSTS = ["10.0.2.2", "127.0.0.1", "taufoods.onrender.com", "10.0.14.150"]
 
 # Application definition
 
@@ -98,7 +98,7 @@ WSGI_APPLICATION = 'djangoProject.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.parse(os.environ.get("DATABASE_URL"))
-}
+ }
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
