@@ -18,12 +18,7 @@ import cloudinary.api
 
 import dj_database_url
 
-cloudinary.config(
-    cloud_name='domxe7bns',
-    api_key='793978527853643',
-    api_secret='0HoCYrOHJw90AuOoNTmL_0OqudI',
-    secure=True
-)
+
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -97,18 +92,9 @@ WSGI_APPLICATION = 'djangoProject.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.parse(os.environ.get("DATABASE_URL"))
- }
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'cafeteria',
-#         'USER': 'postgres',
-#         'PASSWORD': 'root',
-#         'HOST': '127.0.0.1',
-#         'PORT': '5432',
-#     }
-# }
+     'default': dj_database_url.parse(os.environ.get("DATABASE_URL"))
+}
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators

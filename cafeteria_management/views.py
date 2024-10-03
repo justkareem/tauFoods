@@ -21,8 +21,7 @@ def register(request):
         form = RegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            Group.objects.get_or_create(name='staff')
-            group = Group.objects.get(name='staff')
+            group = Group.objects.get_or_create(name='staff')
             user.groups.add(group)
             messages.success(request, 'Registration successful.')
             return redirect('login')
@@ -96,8 +95,6 @@ def send_push_notification(contents, headings):
     }
 
     response = requests.post(url, json=payload, headers=headers)
-
-    print(response.text)
 
 
 @login_required
